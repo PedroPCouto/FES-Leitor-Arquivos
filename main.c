@@ -59,6 +59,42 @@ void cadastrarCliente()
   printf("Cliente cadastrado com sucesso!\n");
 }
 
+void cadastrarVeiculo()
+{
+  Veiculo novoVeiculo;
+  FILE *arquivo;
+
+  printf("\nCadastro de Veículo\n");
+
+  printf("Digite o código do veículo: ");
+  scanf("%d", &novoVeiculo.codigo);
+  getchar();
+
+  printf("Digite a marca do veículo: ");
+  fgets(novoVeiculo.marca, 50, stdin);
+  novoVeiculo.marca[strcspn(novoVeiculo.marca, "\n")] = 0;
+
+  printf("Digite o modelo do veículo: ");
+  fgets(novoVeiculo.modelo, 50, stdin);
+  novoVeiculo.modelo[strcspn(novoVeiculo.modelo, "\n")] = 0;
+
+  printf("Digite a placa do veículo: ");
+  fgets(novoVeiculo.placa, 20, stdin);
+  novoVeiculo.placa[strcspn(novoVeiculo.placa, "\n")] = 0;
+
+  arquivo = fopen("veiculos.dat", "ab");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  fwrite(&novoVeiculo, sizeof(Veiculo), 1, arquivo);
+
+  fclose(arquivo);
+  printf("Veículo cadastrado com sucesso!\n");
+}
+
 int main()
 {
   int opcao;
@@ -85,7 +121,7 @@ int main()
       cadastrarCliente();
       break;
     case 2:
-      // cadastrarVeiculo();
+      cadastrarVeiculo();
       break;
     case 3:
       // cadastrarLocacao();

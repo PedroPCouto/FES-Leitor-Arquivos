@@ -95,6 +95,46 @@ void cadastrarVeiculo()
   printf("Veículo cadastrado com sucesso!\n");
 }
 
+void cadastrarLocacao()
+{
+  Locacao novaLocacao;
+  FILE *arquivo;
+
+  printf("\nCadastro de Locação\n");
+
+  printf("Digite o código da locação: ");
+  scanf("%d", &novaLocacao.codigoLocacao);
+  getchar();
+
+  printf("Digite o código do cliente: ");
+  scanf("%d", &novaLocacao.codigoCliente);
+  getchar();
+
+  printf("Digite o código do veículo: ");
+  scanf("%d", &novaLocacao.codigoVeiculo);
+  getchar();
+
+  printf("Digite a data de início (DD/MM/AAAA): ");
+  fgets(novaLocacao.dataInicio, 11, stdin);
+  novaLocacao.dataInicio[strcspn(novaLocacao.dataInicio, "\n")] = 0;
+
+  printf("Digite a data de fim (DD/MM/AAAA): ");
+  fgets(novaLocacao.dataFim, 11, stdin);
+  novaLocacao.dataFim[strcspn(novaLocacao.dataFim, "\n")] = 0;
+
+  arquivo = fopen("locacoes.dat", "ab");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  fwrite(&novaLocacao, sizeof(Locacao), 1, arquivo);
+
+  fclose(arquivo);
+  printf("Locação cadastrada com sucesso!\n");
+}
+
 int main()
 {
   int opcao;
@@ -124,7 +164,7 @@ int main()
       cadastrarVeiculo();
       break;
     case 3:
-      // cadastrarLocacao();
+      cadastrarLocacao();
       break;
     case 4:
       // baixarLocacao();

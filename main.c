@@ -135,6 +135,81 @@ void cadastrarLocacao()
   printf("Locação cadastrada com sucesso!\n");
 }
 
+struct tm converterData(char *data)
+{
+  struct tm tmData;
+  sscanf(data, "%d/%d/%d", &tmData.tm_mday, &tmData.tm_mon, &tmData.tm_year);
+  tmData.tm_mon -= 1;
+  tmData.tm_year -= 1900;
+  tmData.tm_isdst = -1;
+
+  return tmData;
+}
+
+int diferencaDias(char *dataInicio, char *dataFim)
+{
+  struct tm tmInicio = converterData(dataInicio);
+  struct tm tmFim = converterData(dataFim);
+
+  time_t inicio = mktime(&tmInicio);
+  time_t fim = mktime(&tmFim);
+
+  return (int)difftime(fim, inicio) / (60 * 60 * 24);
+}
+
+float calcularValorLocacao(Locacao locacao)
+{
+  int diasLocacao = diferencaDias(locacao.dataInicio, locacao.dataFim);
+  float tarifaDiaria = 100.0f;
+
+  float valorTotal = diasLocacao * tarifaDiaria;
+
+  return valorTotal;
+}
+
+void baixarLocacao()
+{
+  int codigo;
+  FILE *arquivo;
+  Locacao locacao;
+  int encontrou = 0;
+  float valorTotal;
+
+  printf("\nBaixa de Locação\n");
+  printf("Digite o código da locação: ");
+  scanf("%d", &codigo);
+
+  arquivo = fopen("locacoes.dat", "rb+");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  while (fread(&locacao, sizeof(Locacao), 1, arquivo))
+  {
+    if (locacao.codigoLocacao == codigo)
+    {
+      encontrou = 1;
+      break;
+    }
+  }
+
+  if (!encontrou)
+  {
+    printf("Locação não encontrada.\n");
+  }
+  else
+  {
+
+    valorTotal = calcularValorLocacao(locacao);
+
+    printf("Valor total da locação: %.2f\n", valorTotal);
+  }
+
+  fclose(arquivo);
+}
+
 int main()
 {
   int opcao;

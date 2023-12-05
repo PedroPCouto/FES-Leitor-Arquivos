@@ -249,6 +249,45 @@ void pesquisarCliente()
   fclose(arquivo);
 }
 
+void pesquisarVeiculo()
+{
+  int codigoPesquisa;
+  Veiculo veiculo;
+  FILE *arquivo;
+  int encontrou = 0;
+
+  printf("\nPesquisa de Veículo\n");
+  printf("Digite o código do veículo: ");
+  scanf("%d", &codigoPesquisa);
+
+  arquivo = fopen("veiculos.dat", "rb");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  while (fread(&veiculo, sizeof(Veiculo), 1, arquivo))
+  {
+    if (veiculo.codigo == codigoPesquisa)
+    {
+      encontrou = 1;
+      break;
+    }
+  }
+
+  if (!encontrou)
+  {
+    printf("Veículo não encontrado.\n");
+  }
+  else
+  {
+    printf("Código: %d\nMarca: %s\nModelo: %s\nPlaca: %s\n", veiculo.codigo, veiculo.marca, veiculo.modelo, veiculo.placa);
+  }
+
+  fclose(arquivo);
+}
+
 int main()
 {
   int opcao;
@@ -287,7 +326,7 @@ int main()
       pesquisarCliente();
       break;
     case 6:
-      // pesquisarVeiculo();
+      pesquisarVeiculo();
       break;
     case 7:
       // exibirLocacoesCliente();

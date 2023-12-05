@@ -288,6 +288,123 @@ void pesquisarVeiculo()
   fclose(arquivo);
 }
 
+void exibirLocacoesCliente()
+{
+  int codigoClientePesquisa;
+  Locacao locacao;
+  FILE *arquivo;
+  int encontrou = 0;
+
+  printf("\nExibir Locações de um Cliente\n");
+  printf("Digite o código do cliente: ");
+  scanf("%d", &codigoClientePesquisa);
+
+  arquivo = fopen("locacoes.dat", "rb");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  printf("\nLocações do Cliente com Código %d:\n", codigoClientePesquisa);
+  while (fread(&locacao, sizeof(Locacao), 1, arquivo))
+  {
+    if (locacao.codigoCliente == codigoClientePesquisa)
+    {
+      printf("Código da Locação: %d, Código do Veículo: %d, Data de Início: %s, Data de Fim: %s\n",
+             locacao.codigoLocacao, locacao.codigoVeiculo, locacao.dataInicio, locacao.dataFim);
+      encontrou = 1;
+    }
+  }
+
+  if (!encontrou)
+  {
+    printf("Nenhuma locação encontrada para este cliente.\n");
+  }
+
+  fclose(arquivo);
+}
+
+int calcularPontos(Locacao locacao)
+{
+
+  int diasLocacao = diferencaDias(locacao.dataInicio, locacao.dataFim);
+
+  return diasLocacao;
+}
+
+void calcularFidelidade()
+{
+  int codigoClientePesquisa;
+  Locacao locacao;
+  FILE *arquivo;
+  int pontosFidelidade = 0;
+
+  printf("\nCalcular Pontos de Fidelidade\n");
+  printf("Digite o código do cliente: ");
+  scanf("%d", &codigoClientePesquisa);
+
+  arquivo = fopen("locacoes.dat", "rb");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  while (fread(&locacao, sizeof(Locacao), 1, arquivo))
+  {
+    if (locacao.codigoCliente == codigoClientePesquisa)
+    {
+      pontosFidelidade += calcularPontos(locacao);
+    }
+  }
+
+  printf("Total de pontos de fidelidade para o cliente %d: %d pontos\n", codigoClientePesquisa, pontosFidelidade);
+
+  fclose(arquivo);
+}
+
+void funcionalidadeExtra()
+{
+  FILE *arquivoVeiculos, *arquivoLocacoes;
+  Veiculo veiculo;
+  Locacao locacao;
+  int veiculoDisponivel;
+
+  arquivoVeiculos = fopen("veiculos.dat", "rb");
+  if (arquivoVeiculos == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo de veículos!\n");
+    return;
+  }
+
+  printf("\nRelatório de Disponibilidade dos Veículos:\n");
+  while (fread(&veiculo, sizeof(Veiculo), 1, arquivoVeiculos))
+  {
+    veiculoDisponivel = 1;
+
+    arquivoLocacoes = fopen("locacoes.dat", "rb");
+    if (arquivoLocacoes != NULL)
+    {
+      while (fread(&locacao, sizeof(Locacao), 1, arquivoLocacoes))
+      {
+        if (locacao.codigoVeiculo == veiculo.codigo)
+        {
+          veiculoDisponivel = 0;
+          break;
+        }
+      }
+      fclose(arquivoLocacoes);
+    }
+
+    printf("Código: %d, Marca: %s, Modelo: %s, Placa: %s - %s\n",
+           veiculo.codigo, veiculo.marca, veiculo.modelo, veiculo.placa,
+           veiculoDisponivel ? "Disponível" : "Alugado");
+  }
+
+  fclose(arquivoVeiculos);
+}
+
 int main()
 {
   int opcao;
@@ -329,13 +446,13 @@ int main()
       pesquisarVeiculo();
       break;
     case 7:
-      // exibirLocacoesCliente();
+      exibirLocacoesCliente();
       break;
     case 8:
-      // calcularFidelidade();
+      calcularFidelidade();
       break;
     case 9:
-      // funcionalidadeExtra();
+      funcionalidadeExtra();
       break;
     case 0:
       printf("Saindo do sistema...\n");

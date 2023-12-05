@@ -210,6 +210,45 @@ void baixarLocacao()
   fclose(arquivo);
 }
 
+void pesquisarCliente()
+{
+  int codigoPesquisa;
+  Cliente cliente;
+  FILE *arquivo;
+  int encontrou = 0;
+
+  printf("\nPesquisa de Cliente\n");
+  printf("Digite o código do cliente: ");
+  scanf("%d", &codigoPesquisa);
+
+  arquivo = fopen("clientes.dat", "rb");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  while (fread(&cliente, sizeof(Cliente), 1, arquivo))
+  {
+    if (cliente.codigo == codigoPesquisa)
+    {
+      encontrou = 1;
+      break;
+    }
+  }
+
+  if (!encontrou)
+  {
+    printf("Cliente não encontrado.\n");
+  }
+  else
+  {
+    printf("Código: %d\nNome: %s\nEndereço: %s\n", cliente.codigo, cliente.nome, cliente.endereco);
+  }
+
+  fclose(arquivo);
+}
+
 int main()
 {
   int opcao;
@@ -242,10 +281,10 @@ int main()
       cadastrarLocacao();
       break;
     case 4:
-      // baixarLocacao();
+      baixarLocacao();
       break;
     case 5:
-      // pesquisarCliente();
+      pesquisarCliente();
       break;
     case 6:
       // pesquisarVeiculo();

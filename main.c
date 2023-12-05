@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 typedef struct
 {
   int codigo;
@@ -22,6 +27,38 @@ typedef struct
   char dataFim[11];    // Formato DD/MM/AAAA
 } Locacao;
 
+void cadastrarCliente()
+{
+  Cliente novoCliente;
+  FILE *arquivo;
+
+  printf("\nCadastro de Cliente\n");
+
+  printf("Digite o código do cliente: ");
+  scanf("%d", &novoCliente.codigo);
+  getchar();
+
+  printf("Digite o nome do cliente: ");
+  fgets(novoCliente.nome, 100, stdin);
+  novoCliente.nome[strcspn(novoCliente.nome, "\n")] = 0;
+
+  printf("Digite o endereço do cliente: ");
+  fgets(novoCliente.endereco, 150, stdin);
+  novoCliente.endereco[strcspn(novoCliente.endereco, "\n")] = 0;
+
+  arquivo = fopen("clientes.dat", "ab");
+  if (arquivo == NULL)
+  {
+    fprintf(stderr, "Erro ao abrir o arquivo!\n");
+    return;
+  }
+
+  fwrite(&novoCliente, sizeof(Cliente), 1, arquivo);
+
+  fclose(arquivo);
+  printf("Cliente cadastrado com sucesso!\n");
+}
+
 int main()
 {
   int opcao;
@@ -45,7 +82,7 @@ int main()
     switch (opcao)
     {
     case 1:
-      // cadastrarCliente();
+      cadastrarCliente();
       break;
     case 2:
       // cadastrarVeiculo();

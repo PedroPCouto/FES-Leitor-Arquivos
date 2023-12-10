@@ -163,11 +163,8 @@ void cadastrarLocacao() {
         return;
     }
     char nomeCliente[50];
-
     Locacao novaLocacao;
-
     printf("Digite o nome do cliente: "); 
-
     printf("Digite a data de retirada (DD/MM/AAAA): ");
     scanf("%s", novaLocacao.data_retirada);
     printf("Digite a data de devolucao (DD/MM/AAAA): ");
@@ -178,30 +175,21 @@ void cadastrarLocacao() {
     scanf("%d", &novaLocacao.seguro);
     printf("Digite o nome do cliente: ");
     scanf("%s", nomeCliente);
-
     int indiceVeiculoDisponivel = buscarVeiculoDisponivel();
     if (indiceVeiculoDisponivel == -1) {
         printf("Desculpe, nenhum veiculo disponivel no momento.\n");
         return;
     }
-
     int codigoCliente = codigoClientePorNome(nomeCliente);
     if (codigoCliente == -1) {
         printf("Cliente nao encontrado.\n");
         return;
     }
-
     novaLocacao.codigo_cliente = codigoCliente;
     novaLocacao.codigo_veiculo = veiculos[indiceVeiculoDisponivel].codigo;
-
-
-
     locacoes[num_locacoes] = novaLocacao;
-
     strcpy(veiculos[indiceVeiculoDisponivel].status, "alugado");
-
     num_locacoes++;
-
     printf("Locacao cadastrada com sucesso!\n");
 }
 
@@ -223,21 +211,17 @@ Data converterStringParaData(const char *dataString) {
 int calcularDiferencaDatas(const char data1[], const char data2[]) {
     Data primeiraData = converterStringParaData(data1);
     Data segundaData = converterStringParaData(data2);
-
     const int diasPorMes[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
     int totalDiasData1 = primeiraData.ano * 365 + primeiraData.dia;
     for (int i = 0; i < primeiraData.mes; ++i) {
         totalDiasData1 += diasPorMes[i];
     }
     totalDiasData1 += (primeiraData.ano / 4) - (primeiraData.ano / 100) + (primeiraData.ano / 400);
-
     int totalDiasData2 = segundaData.ano * 365 + segundaData.dia;
     for (int i = 0; i < segundaData.mes; ++i) {
         totalDiasData2 += diasPorMes[i];
     }
     totalDiasData2 += (segundaData.ano / 4) - (segundaData.ano / 100) + (segundaData.ano / 400);
-
     return abs(totalDiasData2 - totalDiasData1);
 }
 

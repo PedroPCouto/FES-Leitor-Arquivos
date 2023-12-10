@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #define MAX_CLIENTES 100
@@ -49,17 +50,17 @@ int num_clientes = 0;
 int num_veiculos = 0;
 int num_locacoes = 0;
 
-int verificarCodigoClienteExistente(int codigo) {
-    for (int i = 0; i < num_clientes; ++i) {
+bool verificarCodigoClienteExistente(int codigo) {
+    for (int i = 0; i < num_clientes; i++) {
         if (clientes[i].codigo == codigo) {
-            return 1; 
+            return true; 
         }
     }
-    return 0; 
+    return false; 
 }
 
 int gerarNovoCodigoCliente() {
-    return num_clientes + 1; 
+    return rand() % 1000 + 1; 
 }
 
 
@@ -97,19 +98,33 @@ void cadastrarCliente() {
     num_clientes++;
 
     printf("Cliente cadastrado com sucesso!\n");
+
+    FILE *arquivo;
+    arquivo = fopen("./data_files/clientes.txt", "a"); 
+
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    fprintf(arquivo, "Código: %d\n", novoCliente.codigo);
+    fprintf(arquivo, "Nome: %s\n", novoCliente.nome);
+    fprintf(arquivo, "Endereço: %s\n", novoCliente.endereco);
+    fprintf(arquivo, "Telefone: %s\n\n", novoCliente.telefone);
+    fclose(arquivo);
 }
 
-int verificarCodigoVeiculoExistente(int codigo) {
-    for (int i = 0; i < num_veiculos; ++i) {
+bool verificarCodigoVeiculoExistente(int codigo) {
+    for (int i = 0; i < num_veiculos; i++) {
         if (veiculos[i].codigo == codigo) {
-            return 1; 
+            return true; 
         }
     }
-    return 0; 
+    return false; 
 }
 
 int gerarNovoCodigoVeiculo() {
-    return num_veiculos + 1; 
+    return rand() % 1000 + 1;
 }
 
 void cadastrarVeiculo() {
@@ -119,7 +134,6 @@ void cadastrarVeiculo() {
     }
 
     Veiculo novoVeiculo;
-
     printf("Digite a descricao do veiculo: ");
     scanf("%s", novoVeiculo.descricao);
     printf("Digite o modelo do veiculo: ");
@@ -139,12 +153,25 @@ void cadastrarVeiculo() {
     while (verificarCodigoVeiculoExistente(novoCodigo)) {
         novoCodigo = gerarNovoCodigoVeiculo(); 
     }
-
     novoVeiculo.codigo = novoCodigo;
     veiculos[num_veiculos] = novoVeiculo;
     num_veiculos++;
-
     printf("Veiculo cadastrado com sucesso!\n");
+    FILE *arquivo;
+    arquivo = fopen("./data_files/veiculos.txt", "a");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+    fprintf(arquivo, "Código: %d\n", novoVeiculo.codigo);
+    fprintf(arquivo, "Descrição: %s\n", novoVeiculo.descricao);
+    fprintf(arquivo, "Modelo: %s\n", novoVeiculo.modelo);
+    fprintf(arquivo, "Cor: %s\n", novoVeiculo.cor);
+    fprintf(arquivo, "Placa: %s\n", novoVeiculo.placa);
+    fprintf(arquivo, "Valor da Diária: %.2f\n", novoVeiculo.valor_diaria);
+    fprintf(arquivo, "Quantidade de Ocupantes: %d\n", novoVeiculo.quantidade_ocupantes);
+    fprintf(arquivo, "Status: %s\n\n", novoVeiculo.status);
+    fclose(arquivo);
 }
 
 int buscarVeiculoDisponivel() {
@@ -164,12 +191,11 @@ void cadastrarLocacao() {
     }
     char nomeCliente[50];
     Locacao novaLocacao;
-    printf("Digite o nome do cliente: "); 
     printf("Digite a data de retirada (DD/MM/AAAA): ");
     scanf("%s", novaLocacao.data_retirada);
     printf("Digite a data de devolucao (DD/MM/AAAA): ");
     scanf("%s", novaLocacao.data_devolucao);
-    printf("Digite a quantidade de ocupantes: ");
+    printf("Digite a quantidade de dias: ");
     scanf("%d", &novaLocacao.quantidade_dias);
     printf("O cliente deseja contratar um seguro? (1 para sim, 0 para nao): ");
     scanf("%d", &novaLocacao.seguro);
@@ -191,6 +217,20 @@ void cadastrarLocacao() {
     strcpy(veiculos[indiceVeiculoDisponivel].status, "alugado");
     num_locacoes++;
     printf("Locacao cadastrada com sucesso!\n");
+    FILE *arquivo;
+    arquivo = fopen("./data_files/locacoes.txt", "a"); 
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+    fprintf(arquivo, "Código Locação: %d\n", novaLocacao.codigo_locacao);
+    fprintf(arquivo, "Data de Retirada: %s\n", novaLocacao.data_retirada);
+    fprintf(arquivo, "Data de Devolucao: %s\n", novaLocacao.data_devolucao);
+    fprintf(arquivo, "Seguro: %d\n", novaLocacao.seguro);
+    fprintf(arquivo, "Quantidade de Dias: %d\n", novaLocacao.quantidade_dias);
+    fprintf(arquivo, "Código Cliente: %d\n", novaLocacao.codigo_cliente);
+    fprintf(arquivo, "Código Veículo: %d\n\n", novaLocacao.codigo_veiculo);
+    fclose(arquivo);
 }
 
 int encontrarLocacaoPorCodigoCliente(int codigoCliente) {
@@ -468,8 +508,108 @@ void pesquisarClientesPremiados() {
     }
 }
 
+void inicializarDados() {
+    FILE *arquivo;
+    char linha[100];
+
+    arquivo = fopen("./data_files/clientes.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo de clientes.\n");
+        return;
+    }
+
+    Cliente novoCliente;
+    int index_cliente = 0;
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        if (strncmp(linha, "Código:", strlen("Código:")) == 0) {
+            sscanf(linha, "Código: %d", &novoCliente.codigo);
+        } else if (strncmp(linha, "Nome:", strlen("Nome:")) == 0) {
+            sscanf(linha, "Nome: %s", novoCliente.nome);
+        } else if (strncmp(linha, "Endereço:", strlen("Endereço:")) == 0) {
+            sscanf(linha, "Endereço: %s", novoCliente.endereco);
+        } else if (strncmp(linha, "Telefone:", strlen("Telefone:")) == 0) {
+            sscanf(linha, "Telefone: %s", novoCliente.telefone);
+        }
+        clientes[index_cliente] = novoCliente;
+        index_cliente++;
+    }
+
+    fclose(arquivo);
+
+    arquivo = fopen("./data_files/veiculos.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo de veiculos.\n");
+        return;
+    }
+
+    Veiculo novoVeiculo;
+    int index_veiculo = 0;
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        if (strncmp(linha, "Código:", strlen("Código:")) == 0) {
+            sscanf(linha, "Código: %d", &novoVeiculo.codigo);
+        } else if (strncmp(linha, "Descrição:", strlen("Descrição:")) == 0) {
+            sscanf(linha, "Descrição: %s", novoVeiculo.descricao);
+        } else if (strncmp(linha, "Modelo:", strlen("Modelo:")) == 0) {
+            sscanf(linha, "Modelo: %s", novoVeiculo.modelo);
+        } else if (strncmp(linha, "Cor:", strlen("Cor:")) == 0) {
+            sscanf(linha, "Cor: %s", novoVeiculo.cor);
+        } else if (strncmp(linha, "Placa:", strlen("Placa:")) == 0) {
+            sscanf(linha, "Placa: %s", novoVeiculo.placa);
+        } else if (strncmp(linha, "Valor Diária:", strlen("Valor Diária:")) == 0) {
+            sscanf(linha, "Valor Diária: %f", &novoVeiculo.valor_diaria);
+        } else if (strncmp(linha, "Quantidade de Ocupantes:", strlen("Quantidade de Ocupantes:")) == 0) {
+            sscanf(linha, "Quantidade de Ocupantes: %d", &novoVeiculo.quantidade_ocupantes);
+        } else if (strncmp(linha, "Status:", strlen("Status:")) == 0) {
+            sscanf(linha, "Status: %s", novoVeiculo.status);
+        }
+
+        veiculos[index_veiculo] = novoVeiculo;
+        index_veiculo++;
+    }
+
+
+    fclose(arquivo);
+
+    arquivo = fopen("./data_files/locacoes.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo de locacoes.\n");
+        return;
+    }
+
+   Locacao novaLocacao;
+    int index_locacao = 0;
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        if (strncmp(linha, "Código Locação:", strlen("Código Locação:")) == 0) {
+            sscanf(linha, "Código Locação: %d", &novaLocacao.codigo_locacao);
+        } else if (strncmp(linha, "Data de Retirada:", strlen("Data de Retirada:")) == 0) {
+            sscanf(linha, "Data de Retirada: %s", novaLocacao.data_retirada);
+        } else if (strncmp(linha, "Data de Devolucao:", strlen("Data de Devolucao:")) == 0) {
+            sscanf(linha, "Data de Devolucao: %s", novaLocacao.data_devolucao);
+        } else if (strncmp(linha, "Seguro:", strlen("Seguro:")) == 0) {
+            sscanf(linha, "Seguro: %d", &novaLocacao.seguro);
+        } else if (strncmp(linha, "Quantidade de Dias:", strlen("Quantidade de Dias:")) == 0) {
+            sscanf(linha, "Quantidade de Dias: %d", &novaLocacao.quantidade_dias);
+        } else if (strncmp(linha, "Código Cliente:", strlen("Código Cliente:")) == 0) {
+            sscanf(linha, "Código Cliente: %d", &novaLocacao.codigo_cliente);
+        } else if (strncmp(linha, "Código Veículo:", strlen("Código Veículo:")) == 0) {
+            sscanf(linha, "Código Veículo: %d", &novaLocacao.codigo_veiculo);
+        }
+        locacoes[index_locacao] = novaLocacao;
+        index_locacao++;
+    }
+
+    fclose(arquivo);
+
+    printf("Dados carregados com sucesso!\n");
+}
+
+
 
 int main() {
+    inicializarDados();
     int opcao;
     int codigo;
     printf("Selecione a opcao desejada:\n");

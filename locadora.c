@@ -106,7 +106,7 @@ void cadastrarCliente() {
         printf("Erro ao abrir o arquivo.\n");
         return;
     }
-
+    fprintf(arquivo, "\n");
     fprintf(arquivo, "Código: %d\n", novoCliente.codigo);
     fprintf(arquivo, "Nome: %s\n", novoCliente.nome);
     fprintf(arquivo, "Endereço: %s\n", novoCliente.endereco);
@@ -290,7 +290,6 @@ void darBaixaLocacao() {
 
 void pesquisarClientePorNome(const char nome[]) {
     int encontrado = 0;
-
     for (int i = 0; i < num_clientes; ++i) {
         if (strcmp(clientes[i].nome, nome) == 0) {
             printf("Cliente Encontrado:\n");
@@ -519,7 +518,6 @@ void inicializarDados() {
     }
 
     Cliente novoCliente;
-    int index_cliente = 0;
 
     while (fgets(linha, sizeof(linha), arquivo)) {
         if (strncmp(linha, "Código:", strlen("Código:")) == 0) {
@@ -530,9 +528,9 @@ void inicializarDados() {
             sscanf(linha, "Endereço: %s", novoCliente.endereco);
         } else if (strncmp(linha, "Telefone:", strlen("Telefone:")) == 0) {
             sscanf(linha, "Telefone: %s", novoCliente.telefone);
+            clientes[num_clientes] = novoCliente;
+            num_clientes++;
         }
-        clientes[index_cliente] = novoCliente;
-        index_cliente++;
     }
 
     fclose(arquivo);
@@ -544,7 +542,6 @@ void inicializarDados() {
     }
 
     Veiculo novoVeiculo;
-    int index_veiculo = 0;
 
     while (fgets(linha, sizeof(linha), arquivo)) {
         if (strncmp(linha, "Código:", strlen("Código:")) == 0) {
@@ -563,10 +560,10 @@ void inicializarDados() {
             sscanf(linha, "Quantidade de Ocupantes: %d", &novoVeiculo.quantidade_ocupantes);
         } else if (strncmp(linha, "Status:", strlen("Status:")) == 0) {
             sscanf(linha, "Status: %s", novoVeiculo.status);
+            veiculos[num_veiculos] = novoVeiculo;
+            num_veiculos++;
         }
 
-        veiculos[index_veiculo] = novoVeiculo;
-        index_veiculo++;
     }
 
 
@@ -579,7 +576,6 @@ void inicializarDados() {
     }
 
    Locacao novaLocacao;
-    int index_locacao = 0;
 
     while (fgets(linha, sizeof(linha), arquivo)) {
         if (strncmp(linha, "Código Locação:", strlen("Código Locação:")) == 0) {
@@ -596,9 +592,9 @@ void inicializarDados() {
             sscanf(linha, "Código Cliente: %d", &novaLocacao.codigo_cliente);
         } else if (strncmp(linha, "Código Veículo:", strlen("Código Veículo:")) == 0) {
             sscanf(linha, "Código Veículo: %d", &novaLocacao.codigo_veiculo);
+            locacoes[num_locacoes] = novaLocacao;
+            num_locacoes++;
         }
-        locacoes[index_locacao] = novaLocacao;
-        index_locacao++;
     }
 
     fclose(arquivo);
